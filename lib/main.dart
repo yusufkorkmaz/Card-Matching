@@ -1,4 +1,6 @@
+import 'package:card_matching/pages/game_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const Game());
@@ -9,8 +11,12 @@ class Game extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    return   MaterialApp(
+      home: GamePage(),
     );
   }
 }
