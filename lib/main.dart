@@ -15,9 +15,9 @@ class Game extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return   MaterialApp(
+
+    return const MaterialApp(
       home: GamePage(),
     );
   }
 }
-

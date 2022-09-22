@@ -12,9 +12,11 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   int maxImagesNumberInImagesFolder = 5;
+
   static int get getTotalCardCount => 6;
   var randomNumber = Random();
   var cardsOnScreen = List<Widget>.filled(getTotalCardCount, Container());
+  String clickedCardName = '';
 
   randomImageNumberChoose() {
     List<int> randomImageNumbers = [];
@@ -46,10 +48,18 @@ class _GamePageState extends State<GamePage> {
   generateCards(List<int> randomImageNumbers, List<int> randomIndexNumbers) {
     int imageNumberIndex = 0;
     for (int i = 0; i < getTotalCardCount; i += 2) {
-      cardsOnScreen[randomIndexNumbers[i]] =
-          CustomCard(imageName: '${randomImageNumbers[imageNumberIndex]}.png');
-      cardsOnScreen[randomIndexNumbers[i + 1]] =
-          CustomCard(imageName: '${randomImageNumbers[imageNumberIndex]}.png');
+      cardsOnScreen[randomIndexNumbers[i]] = CustomCard(
+        imageName: '${randomImageNumbers[imageNumberIndex]}.png',
+        clickedCardNameFunc: (val) {
+           setState(() => {clickedCardName = val, print(clickedCardName)});
+        },
+      );
+      cardsOnScreen[randomIndexNumbers[i + 1]] = CustomCard(
+        imageName: '${randomImageNumbers[imageNumberIndex]}.png',
+        clickedCardNameFunc: (val) {
+          setState(() => {clickedCardName = val,print(clickedCardName)});
+        },
+      );
       imageNumberIndex++;
     }
   }
@@ -65,6 +75,7 @@ class _GamePageState extends State<GamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.amber, title: Text('Card Matching Game'),),
       body: Center(
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),

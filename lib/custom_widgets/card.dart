@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
+typedef void StringCallback(String val);
+
 class CustomCard extends StatefulWidget {
   final String imageName;
+  final Function clickedCardNameFunc;
 
   const CustomCard({
     Key? key,
     required this.imageName,
+    required this.clickedCardNameFunc,
   }) : super(key: key);
 
   @override
@@ -16,6 +20,7 @@ class _CustomCardState extends State<CustomCard> {
   bool isImageShowed = false;
 
   onClickedCard() {
+    widget.clickedCardNameFunc(widget.imageName);
     setState(() => {
       isImageShowed = !isImageShowed,
     });
