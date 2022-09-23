@@ -12,13 +12,13 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   int maxImagesNumberInImagesFolder = 5;
-
   static int get getTotalCardCount => 6;
   var randomNumber = Random();
   var cardsOnScreen = List<Widget>.filled(getTotalCardCount, Container());
   String clickedCardName = '';
+  int clickedCardIndex = 0;
   int score = 0;
-  List<String> clickedCards = [];
+  List<List> clickedCards = [];
 
   randomImageNumberChoose() {
     List<int> randomImageNumbers = [];
@@ -47,21 +47,22 @@ class _GamePageState extends State<GamePage> {
     return randomIndexNumbers;
   }
 
-  afterClickedOneCard(String imageNameInClickedCard) {
+  afterClickedOneCard(String imageNameInClickedCard, int imageIndex) {
     setState(() => {
           clickedCardName = imageNameInClickedCard,
-          clickedCards.add(clickedCardName),
-          print(clickedCards),
-          if (clickedCards.length == 2)
+          clickedCardIndex = imageIndex,
+          clickedCards.add([clickedCardName, imageIndex]),
+      print(clickedCards),
+
+      if (clickedCards.length == 2)
             {
-              if (clickedCards[0] == clickedCards[1])
+              if (clickedCards[0][0] == clickedCards[1][0] && clickedCards[0][1] != clickedCards[1][1])
                 {
                   score += 10,
                   clickedCards = [],
                 }
               else
                 {
-
                   clickedCards = [],
                 }
             }
@@ -72,11 +73,13 @@ class _GamePageState extends State<GamePage> {
     int imageNumberIndex = 0;
     for (int i = 0; i < getTotalCardCount; i += 2) {
       cardsOnScreen[randomIndexNumbers[i]] = CustomCard(
+        cardIndex: randomIndexNumbers[i],
           imageName: '${randomImageNumbers[imageNumberIndex]}.png',
-          clickedCardNameFunc: (imageName) => afterClickedOneCard(imageName));
+          clickedCardNameFunc: (imageName, cardIndex) => afterClickedOneCard(imageName, cardIndex));
       cardsOnScreen[randomIndexNumbers[i + 1]] = CustomCard(
+        cardIndex: randomIndexNumbers[i+1],
           imageName: '${randomImageNumbers[imageNumberIndex]}.png',
-          clickedCardNameFunc: (imageName) => afterClickedOneCard(imageName));
+          clickedCardNameFunc: (imageName, cardIndex) => afterClickedOneCard(imageName, cardIndex));
       imageNumberIndex++;
     }
   }

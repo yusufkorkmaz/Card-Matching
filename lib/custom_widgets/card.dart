@@ -4,10 +4,12 @@ typedef void StringCallback(String val);
 
 class CustomCard extends StatefulWidget {
   final String imageName;
+  final int cardIndex;
   final Function clickedCardNameFunc;
 
   const CustomCard({
     Key? key,
+    required this.cardIndex,
     required this.imageName,
     required this.clickedCardNameFunc,
   }) : super(key: key);
@@ -20,7 +22,7 @@ class _CustomCardState extends State<CustomCard> {
   bool isImageShowed = false;
 
   onClickedCard() {
-    widget.clickedCardNameFunc(widget.imageName);
+    widget.clickedCardNameFunc(widget.imageName, widget.cardIndex);
     setState(() => {
       isImageShowed = !isImageShowed,
     });
