@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 typedef void StringCallback(String val);
 
 class CustomCard extends StatefulWidget {
-  final String imageName;
-  final int cardIndex;
-  final Function clickedCardNameFunc;
+  int cardIndex;
+  String imageName;
+  bool isClickable;
+  bool isImageShowed;
+  Function clickedCardNameFunc;
 
-  const CustomCard({
+  CustomCard({
     Key? key,
+    this.isClickable = true,
+    this.isImageShowed = false,
     required this.cardIndex,
     required this.imageName,
     required this.clickedCardNameFunc,
@@ -19,21 +23,16 @@ class CustomCard extends StatefulWidget {
 }
 
 class _CustomCardState extends State<CustomCard> {
-  bool isImageShowed = false;
-
   onClickedCard() {
-    widget.clickedCardNameFunc(widget.imageName, widget.cardIndex);
-    setState(() => {
-      isImageShowed = !isImageShowed,
-    });
+    setState(() => {widget.clickedCardNameFunc(widget)});
   }
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: onClickedCard,
+      onPressed: widget.isClickable ? onClickedCard : () => {},
       child: Visibility(
-        visible: isImageShowed,
+        visible: widget.isImageShowed,
         child: Image.asset(
           'lib/images/${widget.imageName}',
           width: 50,

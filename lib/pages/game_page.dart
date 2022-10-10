@@ -4,7 +4,9 @@ import 'package:card_matching/custom_widgets/card.dart';
 import 'package:flutter/material.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({Key? key}) : super(key: key);
+  final String appHeader;
+
+  const GamePage({Key? key, required this.appHeader}) : super(key: key);
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -12,13 +14,14 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   int maxImagesNumberInImagesFolder = 5;
+
   static int get getTotalCardCount => 6;
   var randomNumber = Random();
   var cardsOnScreen = List<Widget>.filled(getTotalCardCount, Container());
   String clickedCardName = '';
   int clickedCardIndex = 0;
   int score = 0;
-  List<List> clickedCards = [];
+  List<CustomCard> clickedCards = [];
 
   randomImageNumberChoose() {
     List<int> randomImageNumbers = [];
@@ -47,25 +50,31 @@ class _GamePageState extends State<GamePage> {
     return randomIndexNumbers;
   }
 
-  afterClickedOneCard(String imageNameInClickedCard, int imageIndex) {
+  afterClickedOneCard(CustomCard clickedCard) {
     setState(() => {
-          clickedCardName = imageNameInClickedCard,
-          clickedCardIndex = imageIndex,
-          clickedCards.add([clickedCardName, imageIndex]),
-      print(clickedCards),
+          clickedCards.add(clickedCard),
+          clickedCard.isImageShowed = !clickedCard.isImageShowed,
+          if(clickedCards.length == 3) {
+            setState(()=> {
+              clickedCards[1].isImageShowed = false,
 
-      if (clickedCards.length == 2)
+            })
+          }
+         /* if (clickedCards.length == 2)
             {
-              if (clickedCards[0][0] == clickedCards[1][0] && clickedCards[0][1] != clickedCards[1][1])
+              if (clickedCards[0].imageName == clickedCards[1].imageName &&
+                  clickedCards[0].cardIndex != clickedCards[1].cardIndex)
                 {
                   score += 10,
                   clickedCards = [],
                 }
               else
                 {
+                  clickedCards[0].isImageShowed = false,
+                  clickedCards[1].isImageShowed = false,
                   clickedCards = [],
                 }
-            }
+            }*/
         });
   }
 
@@ -73,13 +82,15 @@ class _GamePageState extends State<GamePage> {
     int imageNumberIndex = 0;
     for (int i = 0; i < getTotalCardCount; i += 2) {
       cardsOnScreen[randomIndexNumbers[i]] = CustomCard(
-        cardIndex: randomIndexNumbers[i],
+          cardIndex: randomIndexNumbers[i],
           imageName: '${randomImageNumbers[imageNumberIndex]}.png',
-          clickedCardNameFunc: (imageName, cardIndex) => afterClickedOneCard(imageName, cardIndex));
+          clickedCardNameFunc: (clickedCard) =>
+              afterClickedOneCard(clickedCard));
       cardsOnScreen[randomIndexNumbers[i + 1]] = CustomCard(
-        cardIndex: randomIndexNumbers[i+1],
+          cardIndex: randomIndexNumbers[i + 1],
           imageName: '${randomImageNumbers[imageNumberIndex]}.png',
-          clickedCardNameFunc: (imageName, cardIndex) => afterClickedOneCard(imageName, cardIndex));
+          clickedCardNameFunc: (clickedCard) =>
+              afterClickedOneCard(clickedCard));
       imageNumberIndex++;
     }
   }
@@ -93,19 +104,19 @@ class _GamePageState extends State<GamePage> {
   }
 
   get scoreText => Padding(
-    padding: const EdgeInsets.all(12),
-    child: Text(
-      'Score: $score',
-      style: TextStyle(fontSize: 40),
-    ),
-  );
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          'Score: $score',
+          style: const TextStyle(fontSize: 40),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber,
-        title: Text('Card Matching Game'),
+        title: Text(widget.appHeader),
       ),
       body: Center(
         child: Column(children: [

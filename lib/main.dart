@@ -17,7 +17,7 @@ class Game extends StatelessWidget {
     ]);
 
     return const MaterialApp(
-      home: GamePage(),
+      home: GamePage(appHeader: 'Card Matching Game'),
     );
   }
 }
