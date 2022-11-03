@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:math';
-
 import 'package:card_matching/custom_widgets/card.dart';
 import 'package:flutter/material.dart';
 
@@ -13,15 +13,25 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
+  //game difficulty
+  int cardsClosingMilliseconds = 750;
+  static int get getTotalCardCount => 4;
   int maxImagesNumberInImagesFolder = 5;
 
-  static int get getTotalCardCount => 6;
-  var randomNumber = Random();
-  var cardsOnScreen = List<Widget>.filled(getTotalCardCount, Container());
-  String clickedCardName = '';
-  int clickedCardIndex = 0;
   int score = 0;
-  List<CustomCard> clickedCards = [];
+  int clickedCardIndex = 0;
+  int firstClickedCardIndex = 0;
+  int secondClickedCardIndex = 0;
+  String firstClickedCardImageName = "";
+  String secondClickedCardImageName = "";
+
+  Random randomNumber = Random();
+
+  List<Map> cardsOnScreen = [{}, {}, {}, {}];
+  String clickedCardName = '';
+
+  List openedCard = [];
+  List clickedCards = [];
 
   randomImageNumberChoose() {
     List<int> randomImageNumbers = [];
@@ -51,47 +61,62 @@ class _GamePageState extends State<GamePage> {
   }
 
   afterClickedOneCard(CustomCard clickedCard) {
-    setState(() => {
-          clickedCards.add(clickedCard),
-          clickedCard.isImageShowed = !clickedCard.isImageShowed,
-          if(clickedCards.length == 3) {
-            setState(()=> {
-              clickedCards[1].isImageShowed = false,
-
-            })
+    setState(
+      () => {
+        clickedCards.add(clickedCard),
+        clickedCardIndex = clickedCard.cardIndex,
+        cardsOnScreen[clickedCardIndex]['isImageShowing'] =
+            !cardsOnScreen[clickedCardIndex]['isImageShowing'],
+        if (clickedCards.length == 2)
+          {
+            firstClickedCardIndex = clickedCards[0].cardIndex,
+            secondClickedCardIndex = clickedCards[1].cardIndex,
+            firstClickedCardImageName = clickedCards[0].imageName,
+            secondClickedCardImageName = clickedCards[1].imageName,
+            if (firstClickedCardImageName == secondClickedCardImageName &&
+                firstClickedCardIndex != secondClickedCardIndex)
+              {
+                score += 10,
+                cardsOnScreen[firstClickedCardIndex]['isClickable'] = false,
+                cardsOnScreen[secondClickedCardIndex]['isClickable'] = false,
+                clickedCards = []
+              }
+            else
+              {
+                Timer(Duration(milliseconds: cardsClosingMilliseconds), () {
+                  setState(() => {
+                        cardsOnScreen[firstClickedCardIndex]['isImageShowing'] =
+                            false,
+                        cardsOnScreen[secondClickedCardIndex]
+                            ['isImageShowing'] = false,
+                        clickedCards = [],
+                      });
+                }),
+              }
           }
-         /* if (clickedCards.length == 2)
-            {
-              if (clickedCards[0].imageName == clickedCards[1].imageName &&
-                  clickedCards[0].cardIndex != clickedCards[1].cardIndex)
-                {
-                  score += 10,
-                  clickedCards = [],
-                }
-              else
-                {
-                  clickedCards[0].isImageShowed = false,
-                  clickedCards[1].isImageShowed = false,
-                  clickedCards = [],
-                }
-            }*/
-        });
+      },
+    );
   }
 
   generateCards(List<int> randomImageNumbers, List<int> randomIndexNumbers) {
+    //same image assignment in
+    // cardsOnScreen[randomIndexNumbers[i]]
+    // and
+    // cardsOnScreen[randomIndexNumbers[i+1]]
+    // then imageIndex increase
     int imageNumberIndex = 0;
-    for (int i = 0; i < getTotalCardCount; i += 2) {
-      cardsOnScreen[randomIndexNumbers[i]] = CustomCard(
-          cardIndex: randomIndexNumbers[i],
-          imageName: '${randomImageNumbers[imageNumberIndex]}.png',
-          clickedCardNameFunc: (clickedCard) =>
-              afterClickedOneCard(clickedCard));
-      cardsOnScreen[randomIndexNumbers[i + 1]] = CustomCard(
-          cardIndex: randomIndexNumbers[i + 1],
-          imageName: '${randomImageNumbers[imageNumberIndex]}.png',
-          clickedCardNameFunc: (clickedCard) =>
-              afterClickedOneCard(clickedCard));
-      imageNumberIndex++;
+    for (int i = 0; i < getTotalCardCount; i++) {
+      if (i % 2 == 0 && i != 0) {
+        imageNumberIndex++;
+      }
+      cardsOnScreen[randomIndexNumbers[i]] = {
+        "cardIndex": randomIndexNumbers[i],
+        "isClickable": true,
+        "isImageShowing": false,
+        "imageName": '${randomImageNumbers[imageNumberIndex]}.png',
+        "clickedCardNameFunc": (CustomCard clickedCard) =>
+            afterClickedOneCard(clickedCard),
+      };
     }
   }
 
@@ -119,18 +144,27 @@ class _GamePageState extends State<GamePage> {
         title: Text(widget.appHeader),
       ),
       body: Center(
-        child: Column(children: [
-          scoreText,
-          GridView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: cardsOnScreen.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-            ),
-            itemBuilder: (context, index) => cardsOnScreen[index],
-          )
-        ]),
+        child: Column(
+          children: [
+            scoreText,
+            GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: cardsOnScreen.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+              ),
+              itemBuilder: (context, index) => CustomCard(
+                cardIndex: cardsOnScreen[index]['cardIndex'],
+                imageName: cardsOnScreen[index]['imageName'],
+                isClickable: cardsOnScreen[index]['isClickable'],
+                isImageShowing: cardsOnScreen[index]['isImageShowing'],
+                clickedCardNameFunc: cardsOnScreen[index]
+                    ['clickedCardNameFunc'],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

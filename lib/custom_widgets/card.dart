@@ -6,13 +6,13 @@ class CustomCard extends StatefulWidget {
   int cardIndex;
   String imageName;
   bool isClickable;
-  bool isImageShowed;
+  bool isImageShowing;
   Function clickedCardNameFunc;
 
   CustomCard({
     Key? key,
     this.isClickable = true,
-    this.isImageShowed = false,
+    required this.isImageShowing,
     required this.cardIndex,
     required this.imageName,
     required this.clickedCardNameFunc,
@@ -29,15 +29,20 @@ class _CustomCardState extends State<CustomCard> {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: widget.isClickable ? onClickedCard : () => {},
-      child: Visibility(
-        visible: widget.isImageShowed,
-        child: Image.asset(
-          'lib/images/${widget.imageName}',
-          width: 50,
-          height: 50,
-        ),
+    return GestureDetector(
+      onTap: widget.isClickable ? onClickedCard : () => {},
+      child: Container(
+        decoration: BoxDecoration(
+            border: Border.all(width: 1),
+            borderRadius: const BorderRadius.all(Radius.circular(12))),
+        margin: const EdgeInsets.all(8),
+        child: widget.isImageShowing
+            ? Image.asset(
+                'lib/images/${widget.imageName}',
+                width: 50,
+                height: 50,
+              )
+            : Container(),
       ),
     );
   }
