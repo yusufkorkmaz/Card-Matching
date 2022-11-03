@@ -34,6 +34,7 @@ class _CustomCardState extends State<CustomCard> {
       child: Container(
         decoration: BoxDecoration(
             border: Border.all(width: 1),
+            color: Colors.white,
             borderRadius: const BorderRadius.all(Radius.circular(12))),
         margin: const EdgeInsets.all(8),
         child: widget.isImageShowing

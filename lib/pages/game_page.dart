@@ -15,6 +15,7 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   //game difficulty
   int cardsClosingMilliseconds = 750;
+
   static int get getTotalCardCount => 4;
   int maxImagesNumberInImagesFolder = 5;
 
@@ -27,11 +28,10 @@ class _GamePageState extends State<GamePage> {
 
   Random randomNumber = Random();
 
-  List<Map> cardsOnScreen = [{}, {}, {}, {}];
-  String clickedCardName = '';
-
   List openedCard = [];
   List clickedCards = [];
+  String clickedCardName = '';
+  List<Map> cardsOnScreen = [{}, {}, {}, {}];
 
   randomImageNumberChoose() {
     List<int> randomImageNumbers = [];
@@ -60,38 +60,54 @@ class _GamePageState extends State<GamePage> {
     return randomIndexNumbers;
   }
 
+  clickedCardsDisable(int firstCardIndex, int secondCardIndex) {
+    cardsOnScreen[firstCardIndex]['isClickable'] = false;
+    cardsOnScreen[secondCardIndex]['isClickable'] = false;
+  }
+
+  clickedCardsEnable(int firstCardIndex, int secondCardIndex) {
+    cardsOnScreen[firstCardIndex]['isClickable'] = true;
+    cardsOnScreen[secondCardIndex]['isClickable'] = true;
+  }
+
+  clickedCardsImageHiding(int firstCardIndex, int secondCardIndex) {
+    cardsOnScreen[firstCardIndex]['isImageShowing'] = false;
+    cardsOnScreen[secondCardIndex]['isImageShowing'] = false;
+  }
+
   afterClickedOneCard(CustomCard clickedCard) {
     setState(
       () => {
         clickedCards.add(clickedCard),
         clickedCardIndex = clickedCard.cardIndex,
-        cardsOnScreen[clickedCardIndex]['isImageShowing'] =
-            !cardsOnScreen[clickedCardIndex]['isImageShowing'],
+        cardsOnScreen[clickedCardIndex]['isImageShowing'] = !cardsOnScreen[clickedCardIndex]['isImageShowing'],
         if (clickedCards.length == 2)
           {
             firstClickedCardIndex = clickedCards[0].cardIndex,
             secondClickedCardIndex = clickedCards[1].cardIndex,
             firstClickedCardImageName = clickedCards[0].imageName,
             secondClickedCardImageName = clickedCards[1].imageName,
-            if (firstClickedCardImageName == secondClickedCardImageName &&
-                firstClickedCardIndex != secondClickedCardIndex)
+
+            if (firstClickedCardImageName == secondClickedCardImageName && firstClickedCardIndex != secondClickedCardIndex)
               {
                 score += 10,
-                cardsOnScreen[firstClickedCardIndex]['isClickable'] = false,
-                cardsOnScreen[secondClickedCardIndex]['isClickable'] = false,
+                clickedCardsDisable(firstClickedCardIndex, secondClickedCardIndex),
                 clickedCards = []
               }
             else
               {
-                Timer(Duration(milliseconds: cardsClosingMilliseconds), () {
-                  setState(() => {
-                        cardsOnScreen[firstClickedCardIndex]['isImageShowing'] =
-                            false,
-                        cardsOnScreen[secondClickedCardIndex]
-                            ['isImageShowing'] = false,
-                        clickedCards = [],
-                      });
-                }),
+                clickedCardsDisable(firstClickedCardIndex, secondClickedCardIndex),
+                Timer(Duration(milliseconds: cardsClosingMilliseconds),
+                  () {
+                    setState(
+                      () => {
+                        clickedCardsImageHiding(firstClickedCardIndex, secondClickedCardIndex),
+                        clickedCardsEnable(firstClickedCardIndex, secondClickedCardIndex)
+                      },
+                    );
+                  },
+                ),
+                clickedCards = [],
               }
           }
       },
