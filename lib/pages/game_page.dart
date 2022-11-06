@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:card_matching/custom_widgets/card.dart';
+import 'package:card_matching/custom_widgets/confetti.dart';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 
 class GamePage extends StatefulWidget {
@@ -13,8 +15,12 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
+  final ConfettiController _controllerCenter =
+      ConfettiController(duration: const Duration(seconds: 10));
+
   //game difficulty
   int cardsClosingMilliseconds = 750;
+  int drawStarClosingSeconds = 2;
 
   static int get getTotalCardCount => 4;
   int maxImagesNumberInImagesFolder = 5;
@@ -80,29 +86,46 @@ class _GamePageState extends State<GamePage> {
       () => {
         clickedCards.add(clickedCard),
         clickedCardIndex = clickedCard.cardIndex,
-        cardsOnScreen[clickedCardIndex]['isImageShowing'] = !cardsOnScreen[clickedCardIndex]['isImageShowing'],
+        cardsOnScreen[clickedCardIndex]['isImageShowing'] =
+            !cardsOnScreen[clickedCardIndex]['isImageShowing'],
         if (clickedCards.length == 2)
           {
             firstClickedCardIndex = clickedCards[0].cardIndex,
             secondClickedCardIndex = clickedCards[1].cardIndex,
             firstClickedCardImageName = clickedCards[0].imageName,
             secondClickedCardImageName = clickedCards[1].imageName,
-
-            if (firstClickedCardImageName == secondClickedCardImageName && firstClickedCardIndex != secondClickedCardIndex)
+            if (firstClickedCardImageName == secondClickedCardImageName &&
+                firstClickedCardIndex != secondClickedCardIndex)
               {
                 score += 10,
-                clickedCardsDisable(firstClickedCardIndex, secondClickedCardIndex),
-                clickedCards = []
-              }
-            else
-              {
-                clickedCardsDisable(firstClickedCardIndex, secondClickedCardIndex),
-                Timer(Duration(milliseconds: cardsClosingMilliseconds),
+                clickedCardsDisable(
+                    firstClickedCardIndex, secondClickedCardIndex),
+                clickedCards = [],
+                _controllerCenter.play(),
+                Timer(
+                  Duration(seconds: drawStarClosingSeconds),
                   () {
                     setState(
                       () => {
-                        clickedCardsImageHiding(firstClickedCardIndex, secondClickedCardIndex),
-                        clickedCardsEnable(firstClickedCardIndex, secondClickedCardIndex)
+                        _controllerCenter.stop(),
+                      },
+                    );
+                  },
+                ),
+              }
+            else
+              {
+                clickedCardsDisable(
+                    firstClickedCardIndex, secondClickedCardIndex),
+                Timer(
+                  Duration(milliseconds: cardsClosingMilliseconds),
+                  () {
+                    setState(
+                      () => {
+                        clickedCardsImageHiding(
+                            firstClickedCardIndex, secondClickedCardIndex),
+                        clickedCardsEnable(
+                            firstClickedCardIndex, secondClickedCardIndex)
                       },
                     );
                   },
@@ -153,6 +176,12 @@ class _GamePageState extends State<GamePage> {
       );
 
   @override
+  void dispose() {
+    _controllerCenter.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -162,6 +191,7 @@ class _GamePageState extends State<GamePage> {
       body: Center(
         child: Column(
           children: [
+            Confetti(controller: _controllerCenter),
             scoreText,
             GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
