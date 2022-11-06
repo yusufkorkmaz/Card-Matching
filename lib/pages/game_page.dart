@@ -19,14 +19,18 @@ class _GamePageState extends State<GamePage> {
       ConfettiController(duration: const Duration(seconds: 10));
 
   //game difficulty
-  int cardsClosingMilliseconds = 750;
   int drawStarClosingSeconds = 2;
+  int cardsClosingMilliseconds = 750;
 
   static int get getTotalCardCount => 4;
   int maxImagesNumberInImagesFolder = 5;
 
+  bool allCardsMatch = false;
+  bool gameOverCardVisible = false;
+
   int score = 0;
   int clickedCardIndex = 0;
+  int matchedCardCounter = 0;
   int firstClickedCardIndex = 0;
   int secondClickedCardIndex = 0;
   String firstClickedCardImageName = "";
@@ -36,6 +40,8 @@ class _GamePageState extends State<GamePage> {
 
   List openedCard = [];
   List clickedCards = [];
+  late List<int> randomImageNumbers;
+  late List<int> randomIndexNumbers;
   String clickedCardName = '';
   List<Map> cardsOnScreen = [{}, {}, {}, {}];
 
@@ -102,16 +108,22 @@ class _GamePageState extends State<GamePage> {
                     firstClickedCardIndex, secondClickedCardIndex),
                 clickedCards = [],
                 _controllerCenter.play(),
-                Timer(
-                  Duration(seconds: drawStarClosingSeconds),
-                  () {
-                    setState(
-                      () => {
-                        _controllerCenter.stop(),
+                matchedCardCounter++,
+                if (matchedCardCounter == cardsOnScreen.length / 2)
+                  {allCardsMatch = true}
+                else
+                  {
+                    Timer(
+                      Duration(seconds: drawStarClosingSeconds),
+                      () {
+                        setState(
+                          () => {
+                            _controllerCenter.stop(),
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
+                    ),
+                  }
               }
             else
               {
@@ -137,6 +149,19 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  resetGame(){
+    setState(() {
+      score = 0;
+      matchedCardCounter = 0;
+      _controllerCenter.stop();
+      randomImageNumbers = randomImageNumberChoose();
+      randomIndexNumbers = randomIndexNumberChoose();
+      generateCards(
+          randomImageNumbers, randomIndexNumbers);
+      allCardsMatch = false;
+    });
+  }
+
   generateCards(List<int> randomImageNumbers, List<int> randomIndexNumbers) {
     //same image assignment in
     // cardsOnScreen[randomIndexNumbers[i]]
@@ -159,14 +184,6 @@ class _GamePageState extends State<GamePage> {
     }
   }
 
-  @override
-  void initState() {
-    List<int> randomImageNumbers = randomImageNumberChoose();
-    List<int> randomIndexNumbers = randomIndexNumberChoose();
-    generateCards(randomImageNumbers, randomIndexNumbers);
-    super.initState();
-  }
-
   get scoreText => Padding(
         padding: const EdgeInsets.all(12),
         child: Text(
@@ -174,6 +191,14 @@ class _GamePageState extends State<GamePage> {
           style: const TextStyle(fontSize: 40),
         ),
       );
+
+  @override
+  void initState() {
+    List<int> randomImageNumbers = randomImageNumberChoose();
+    List<int> randomIndexNumbers = randomIndexNumberChoose();
+    generateCards(randomImageNumbers, randomIndexNumbers);
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -188,29 +213,57 @@ class _GamePageState extends State<GamePage> {
         backgroundColor: Colors.amber,
         title: Text(widget.appHeader),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Confetti(controller: _controllerCenter),
-            scoreText,
-            GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: cardsOnScreen.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
+      body: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            child: Confetti(controller: _controllerCenter),
+          ),
+          Positioned(
+            right: 0,
+            child: Confetti(controller: _controllerCenter),
+          ),
+          Column(
+            children: [
+              scoreText,
+              GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: cardsOnScreen.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                ),
+                itemBuilder: (context, index) => CustomCard(
+                  cardIndex: cardsOnScreen[index]['cardIndex'],
+                  imageName: cardsOnScreen[index]['imageName'],
+                  isClickable: cardsOnScreen[index]['isClickable'],
+                  isImageShowing: cardsOnScreen[index]['isImageShowing'],
+                  clickedCardNameFunc: cardsOnScreen[index]
+                      ['clickedCardNameFunc'],
+                ),
+              )
+            ],
+          ),
+          Center(
+            child: Visibility(
+              visible: allCardsMatch,
+              child: Card(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 30,
+                  height: 300,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                            onPressed: resetGame,
+                            iconSize: 52,
+                            icon: const Icon(Icons.replay))
+                      ]),
+                ),
               ),
-              itemBuilder: (context, index) => CustomCard(
-                cardIndex: cardsOnScreen[index]['cardIndex'],
-                imageName: cardsOnScreen[index]['imageName'],
-                isClickable: cardsOnScreen[index]['isClickable'],
-                isImageShowing: cardsOnScreen[index]['isImageShowing'],
-                clickedCardNameFunc: cardsOnScreen[index]
-                    ['clickedCardNameFunc'],
-              ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }

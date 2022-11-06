@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 
-
 Path drawStar(Size size) {
   // Method to convert degree to radians
   double degToRad(double deg) => deg * (pi / 180.0);
@@ -30,40 +29,30 @@ Path drawStar(Size size) {
 
 class Confetti extends StatelessWidget {
   final controller;
+
   const Confetti({Key? key, required this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.center,
-          child: ConfettiWidget(
-            confettiController: controller,
-            blastDirectionality: BlastDirectionality.explosive,
-            // don't specify a direction, blast randomly
-            shouldLoop: true,
-            // start again as soon as the animation is finished
-            colors: const [
-              Colors.green,
-              Colors.blue,
-              Colors.pink,
-              Colors.orange,
-              Colors.purple
-            ],
-            // manually specify the colors to be used
-            createParticlePath: drawStar, // define a custom shape/path.
-          ),
-        ),
-        Align(
-          alignment: Alignment.center,
-          child: TextButton(
-              onPressed: () {
-                controller.play();
-              },
-              child: Container()),
-        ),
-      ],
+    return Align(
+      alignment: Alignment.center,
+      child: ConfettiWidget(
+        confettiController: controller,
+        blastDirectionality: BlastDirectionality.explosive,
+        // don't specify a direction, blast randomly
+        shouldLoop: true,
+        // start again as soon as the animation is finished
+        colors: const [
+          Colors.green,
+          Colors.blue,
+          Colors.pink,
+          Colors.orange,
+          Colors.purple,
+          Colors.amber
+        ],
+        // manually specify the colors to be used
+        createParticlePath: drawStar, // define a custom shape/path.
+      ),
     );
   }
 }
