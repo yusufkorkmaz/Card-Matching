@@ -43,7 +43,7 @@ class _GamePageState extends State<GamePage> {
   late List<int> randomImageNumbers;
   late List<int> randomIndexNumbers;
   String clickedCardName = '';
-  List<Map> cardsOnScreen = [{}, {}, {}, {}];
+  List<Map> cardsOnScreen = List<Map>.filled(getTotalCardCount, {});
 
   randomImageNumberChoose() {
     List<int> randomImageNumbers = [];
