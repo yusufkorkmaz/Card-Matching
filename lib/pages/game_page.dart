@@ -247,19 +247,20 @@ class _GamePageState extends State<GamePage> {
           Center(
             child: Visibility(
               visible: allCardsMatch,
-              child: Card(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 30,
-                  height: 300,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                            onPressed: resetGame,
-                            iconSize: 52,
-                            icon: const Icon(Icons.replay))
-                      ]),
-                ),
+              child: Container(
+                width: 100,
+                height: 100,
+                margin: const EdgeInsets.only(bottom: 200),
+                decoration: BoxDecoration(color:Colors.amberAccent.withOpacity(0.8), borderRadius: BorderRadius.circular(100.0)),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+
+                          onPressed: resetGame,
+                          iconSize: 52,
+                          icon: const Icon(color: Colors.white, Icons.replay))
+                    ]),
               ),
             ),
           )
