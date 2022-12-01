@@ -64,6 +64,31 @@ flutter:
      - lib/images/3.png
      - lib/images/4.png
      - lib/images/5.png
+     - lib/images/6.png
+     - lib/images/7.png
+     - lib/images/8.png
+     - lib/images/9.png
+     - lib/images/10.png
+     - lib/images/11.png
+     - lib/images/12.png
+     - lib/images/13.png
+     - lib/images/14.png
+     - lib/images/15.png
+     - lib/images/16.png
+     - lib/images/17.png
+     - lib/images/18.png
+     - lib/images/19.png
+     - lib/images/20.png
+     - lib/images/21.png
+     - lib/images/22.png
+     - lib/images/23.png
+     - lib/images/24.png
+     - lib/images/25.png
+     - lib/images/26.png
+     - lib/images/27.png
+     - lib/images/28.png
+     - lib/images/29.png
+     - lib/images/30.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
