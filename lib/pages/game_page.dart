@@ -6,10 +6,15 @@ import 'package:card_matching/custom_widgets/iconButton.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 
+import 'game_start_page.dart';
+
 class GamePage extends StatefulWidget {
   final String appHeader;
+  final int totalCardCount;
 
-  const GamePage({Key? key, required this.appHeader}) : super(key: key);
+  const GamePage(
+      {Key? key, required this.appHeader, required this.totalCardCount})
+      : super(key: key);
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -24,17 +29,17 @@ class _GamePageState extends State<GamePage> {
   int drawStarClosingSeconds = 2;
   int cardsClosingMilliseconds = 750;
 
-  static int get getTotalCardCount => 15;
+  int totalCardCount = 0;
   int totalImageCount = 30;
 
   bool allCardsMatch = false;
   bool gameOverCardVisible = false;
 
   double _turns = 0.0;
-  bool _resetGameIconButtonShowing = false;
-  final int _resetGameIconShowingMillisecondTime = 300;
+  final int _resetGameIconTurningMillisecondTime = 300;
 
   int score = 0;
+  bool gamePaused = false;
   int clickedCardIndex = 0;
   int matchedCardCounter = 0;
   int firstClickedCardIndex = 0;
@@ -49,11 +54,11 @@ class _GamePageState extends State<GamePage> {
   late List<int> randomImageNumbers;
   late List<int> randomIndexNumbers;
   String clickedCardName = '';
-  List<Map> cardsOnScreen = List<Map>.filled(getTotalCardCount, {});
+  late List<Map> cardsOnScreen;
 
   randomImageNumberChoose() {
     List<int> randomImageNumbers = [];
-    for (int i = 0; i < getTotalCardCount / 2; i++) {
+    for (int i = 0; i < totalCardCount / 2; i++) {
       int randomImageNumber = randomNumber.nextInt(totalImageCount) + 1;
       if (randomImageNumbers.contains(randomImageNumber)) {
         i--;
@@ -66,8 +71,8 @@ class _GamePageState extends State<GamePage> {
 
   randomIndexNumberChoose() {
     List<int> randomIndexNumbers = [];
-    for (int i = 0; i < getTotalCardCount; i++) {
-      int randomIndexNumber = randomNumber.nextInt(getTotalCardCount);
+    for (int i = 0; i < totalCardCount; i++) {
+      int randomIndexNumber = randomNumber.nextInt(totalCardCount);
       if (randomIndexNumbers.contains(randomIndexNumber)) {
         i--;
       } else {
@@ -123,7 +128,7 @@ class _GamePageState extends State<GamePage> {
                       () {
                         setState(
                           () => {
-                            _controllerCenter.stop(),
+                            if(!allCardsMatch) _controllerCenter.stop(),
                           },
                         );
                       },
@@ -157,7 +162,7 @@ class _GamePageState extends State<GamePage> {
   gameOver() {
     setState(() => {
           allCardsMatch = true,
-          _resetGameIconButtonShowing = true,
+          gamePaused = true,
         });
   }
 
@@ -172,13 +177,13 @@ class _GamePageState extends State<GamePage> {
       generateCards(randomImageNumbers, randomIndexNumbers);
       allCardsMatch = false;
       Timer(
-        Duration(milliseconds: _resetGameIconShowingMillisecondTime),
+        Duration(milliseconds: _resetGameIconTurningMillisecondTime),
         () {
           setState(
             () => {
               _turns = 0.0,
-              _resetGameIconButtonShowing = false,
-              _controllerCenter.stop(),
+              gamePaused = false,
+
             },
           );
         },
@@ -193,7 +198,7 @@ class _GamePageState extends State<GamePage> {
     // cardsOnScreen[randomIndexNumbers[i+1]]
     // then imageIndex increase
     int imageNumberIndex = 0;
-    for (int i = 0; i < getTotalCardCount; i++) {
+    for (int i = 0; i < totalCardCount; i++) {
       if (i % 2 == 0 && i != 0) {
         imageNumberIndex++;
       }
@@ -213,9 +218,9 @@ class _GamePageState extends State<GamePage> {
   }
 
   _getGridColumnCount() {
-    if (getTotalCardCount == 4) {
+    if (totalCardCount <= 6) {
       return 2;
-    } else if (getTotalCardCount < 24) {
+    } else if (totalCardCount <= 18) {
       return 3;
     } else {
       return 4;
@@ -232,6 +237,8 @@ class _GamePageState extends State<GamePage> {
 
   @override
   void initState() {
+    totalCardCount = widget.totalCardCount;
+    cardsOnScreen = List<Map>.filled(totalCardCount, {});
     List<int> randomImageNumbers = randomImageNumberChoose();
     List<int> randomIndexNumbers = randomIndexNumberChoose();
     generateCards(randomImageNumbers, randomIndexNumbers);
@@ -247,9 +254,21 @@ class _GamePageState extends State<GamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: Visibility(
+        visible: !allCardsMatch,
+        child: FloatingActionButton(
+          backgroundColor: Colors.amber,
+          onPressed: () => {
+            setState(() => {gamePaused = !gamePaused})
+          },
+          child: gamePaused
+              ? const Icon(Icons.play_arrow)
+              : const Icon(Icons.pause),
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: Colors.amber,
-        title: Text(widget.appHeader),
+        title: Center(child: Text(widget.appHeader)),
       ),
       body: Stack(
         children: [
@@ -263,46 +282,80 @@ class _GamePageState extends State<GamePage> {
           ),
           Column(
             children: [
-              scoreText,
-              Expanded(
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: cardsOnScreen.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: _getGridColumnCount(),
-                  ),
-                  itemBuilder: (context, index) => CustomCard(
-                    cardIndex: cardsOnScreen[index]['cardIndex'],
-                    imageName: cardsOnScreen[index]['imageName'],
-                    isClickable: cardsOnScreen[index]['isClickable'],
-                    isImageShowing: cardsOnScreen[index]['isImageShowing'],
-                    clickedCardNameFunc: cardsOnScreen[index]
-                        ['clickedCardNameFunc'],
+              Center(
+                child: scoreText,
+              ),
+              Visibility(
+                visible: !gamePaused,
+                child: Expanded(
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    itemCount: cardsOnScreen.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: _getGridColumnCount(),
+                    ),
+                    itemBuilder: (context, index) => CustomCard(
+                      cardIndex: cardsOnScreen[index]['cardIndex'],
+                      imageName: cardsOnScreen[index]['imageName'],
+                      isClickable: cardsOnScreen[index]['isClickable'],
+                      isImageShowing: cardsOnScreen[index]['isImageShowing'],
+                      clickedCardNameFunc: cardsOnScreen[index]
+                          ['clickedCardNameFunc'],
+                    ),
                   ),
                 ),
               )
             ],
           ),
           Center(
-            child: AnimatedSize(
-              duration: Duration(
-                milliseconds: _resetGameIconShowingMillisecondTime,
-              ),
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              curve: Curves.easeInQuart,
-              child: AnimatedRotation(
-                turns: _turns,
-                duration: Duration(
-                  milliseconds: _resetGameIconShowingMillisecondTime,
-                ),
-                child: CustomIconButton(
-                  onPressed: () => resetGame,
-                  icon: Icons.refresh,
-                  iconButtonShowing: _resetGameIconButtonShowing,
-                ),
+            child: Visibility(
+              visible: gamePaused,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  AnimatedSize(
+                    duration: Duration(
+                      milliseconds: _resetGameIconTurningMillisecondTime,
+                    ),
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    curve: Curves.easeInQuart,
+                    child: AnimatedRotation(
+                      turns: _turns,
+                      duration: Duration(
+                        milliseconds: _resetGameIconTurningMillisecondTime,
+                      ),
+                      child: CustomIconButton(
+                        onPressed: resetGame,
+                        icon: Icons.refresh,
+                        iconButtonShowing: gamePaused,
+                      ),
+                    ),
+                  ),
+                  AnimatedSize(
+                    duration: Duration(
+                      milliseconds: _resetGameIconTurningMillisecondTime,
+                    ),
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    curve: Curves.easeInQuart,
+                    child: CustomIconButton(
+                      onPressed: () {
+                        _controllerCenter.stop();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GameStartPage(),
+                          ),
+                        );
+                      },
+                      icon: Icons.home,
+                      iconButtonShowing: gamePaused,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
+          )
+
         ],
       ),
     );

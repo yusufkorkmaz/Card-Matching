@@ -19,7 +19,7 @@ class CustomIconButton extends StatelessWidget {
     return Visibility(
       visible: iconButtonShowing,
       child: GestureDetector(
-        onTap: onPressed(),
+        onTap: () => onPressed(),
         child: Container(
           alignment: Alignment.center,
           width: 150,
@@ -31,10 +31,10 @@ class CustomIconButton extends StatelessWidget {
             ),
           ),
           child: Icon(
-              icon,
-              size: 70,
-              color: Colors.white,
-            ),
+            icon,
+            size: 70,
+            color: Colors.white,
+          ),
         ),
       ),
     );

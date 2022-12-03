@@ -1,4 +1,4 @@
-import 'package:card_matching/pages/game_page.dart';
+import 'package:card_matching/pages/game_start_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,8 +16,8 @@ class Game extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
 
-    return const MaterialApp(
-      home: GamePage(appHeader: 'Card Matching Game'),
+    return MaterialApp(
+      home: GameStartPage(),
     );
   }
 }

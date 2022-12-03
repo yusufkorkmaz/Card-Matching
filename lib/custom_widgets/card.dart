@@ -43,14 +43,13 @@ class _CustomCardState extends State<CustomCard> {
             border: Border.all(width: 1),
             color: Colors.white,
             borderRadius: const BorderRadius.all(Radius.circular(12))),
-        margin: const EdgeInsets.all(8),
+        margin: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(5),
         child: AnimatedOpacity(
                 opacity: widget.isImageShowing ? 1 : 0,
                 duration: const Duration(milliseconds: 200),
                 child: Image.asset(
                   'lib/images/${widget.imageName}',
-                  width: 50,
-                  height: 50,
                 ),
               )
       ),
