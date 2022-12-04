@@ -1,5 +1,5 @@
+import 'package:card_matching/custom_widgets/levelSelectButton.dart';
 import 'package:card_matching/pages/game_page.dart';
-import 'package:flat_3d_button/flat_3d_button.dart';
 import 'package:flutter/material.dart';
 
 class GameStartPage extends StatelessWidget {
@@ -21,11 +21,8 @@ class GameStartPage extends StatelessWidget {
           itemCount: levels.length,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-            child: Flat3dButton.text(
-              color: Colors.amber,
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-              text: levels[index]['text'],
+            padding: const EdgeInsets.all(20),
+            child: LevelSelectButton(
               onPressed: () => {
                 Navigator.pushReplacement(
                   context,
@@ -36,6 +33,7 @@ class GameStartPage extends StatelessWidget {
                   ),
                 )
               },
+              text: levels[index]['text'],
             ),
           ),
         ),
