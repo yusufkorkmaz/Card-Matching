@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:card_matching/custom_widgets/levelSelectButton.dart';
-import 'package:card_matching/pages/game_page.dart';
+import 'package:card_matching/pages/gamePage.dart';
 import 'package:flutter/material.dart';
 
 class GameStartPage extends StatelessWidget {

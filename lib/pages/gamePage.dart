@@ -6,7 +6,7 @@ import 'package:card_matching/custom_widgets/iconButton.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 
-import 'game_start_page.dart';
+import 'gameStartPage.dart';
 
 class GamePage extends StatefulWidget {
   final String appHeader;

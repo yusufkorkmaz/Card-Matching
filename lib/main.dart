@@ -1,4 +1,4 @@
-import 'package:card_matching/pages/game_start_page.dart';
+import 'package:card_matching/pages/gameStartPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
