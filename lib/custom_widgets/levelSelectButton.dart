@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class LevelSelectButton extends StatefulWidget {
@@ -41,7 +43,12 @@ class _LevelSelectButtonState extends State<LevelSelectButton> {
             buttonPosition = 0;
           });
         },
-        onTap: widget.onPressed,
+        onTap: () => Timer(
+          const Duration(milliseconds: 100),
+          () {
+            widget.onPressed();
+          },
+        ),
         child: Stack(
           children: [
             Positioned(

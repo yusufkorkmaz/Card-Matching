@@ -27,7 +27,7 @@ class _GamePageState extends State<GamePage> {
 
   //game difficulty
   int drawStarClosingSeconds = 2;
-  int cardsClosingMilliseconds = 750;
+  int cardsClosingMilliseconds = 150;
 
   int totalCardCount = 0;
   int totalImageCount = 30;
@@ -137,8 +137,6 @@ class _GamePageState extends State<GamePage> {
               }
             else
               {
-                clickedCardsDisable(
-                    firstClickedCardIndex, secondClickedCardIndex),
                 Timer(
                   Duration(milliseconds: cardsClosingMilliseconds),
                   () {
